@@ -4,7 +4,7 @@ Firmware and server application for DIY telepresence robot
 ## Links
 [Documentation](https://docs.google.com/document/d/1HfuViC98gQP4LPHOGDCBuGeYhDl_x02C) 
 created during the Erasmus+ project named 
-[Trine](https://www.trine-platform.com/)
+[TRinE](https://www.trine-platform.com/)
 .
 
 ## Quick Guide
