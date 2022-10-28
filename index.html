@@ -1,0 +1,350 @@
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+	<style>
+		body {
+			display: flex;
+			flex-direction: row;
+			margin: 0;
+		}
+
+		#botPannel {
+			display: flex;
+                        flex-direction: column;
+			width: 10vw;
+			height: 100%;
+		}
+
+		#robots {
+			display: flex;
+			flex-direction: column;
+			width: 100%;
+			height: 50%;
+			background: #fff;
+		}
+
+		#botInfo {
+                        display: flex;
+                        flex-direction: column;
+                        width: 100%;
+                        height: 30%;
+                        background: #fff;
+                }
+
+		#botDebug {
+			display: flex;
+                        flex-direction: column;
+                        width: 100%;
+                        height: 200%;
+                        background: #fff;
+		}
+		
+		#interface {
+			position: fixed;
+			top: 0;
+			right: 0;
+			width: 90vw;
+			height: 100%;
+		}
+		
+		#video {
+			width: 100%;
+			height: 100%;
+			background: #00f;
+		}
+		
+		#indicators {
+			position: absolute;
+			top: 5vh;
+			right: 0;
+			width: 100%;
+			height: 5vh;
+			background: rgba(0, 0, 0, 0.5);
+		}
+		
+		#buttons {
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			position: absolute;
+			bottom: 5vh;
+			right: 0;
+			width: 100%;
+			height: 10vh;
+			background: rgba(0, 0, 0, 0.5);
+		}
+
+		button {
+			font-size: 4vh;
+			height: 9vh;
+			margin: 0.5vh;
+			border-radius: 1.5vh;
+			-moz-user-select: none;
+                        -webkit-user-select: none;
+                        -ms-user-select: none;
+                        user-select: none;
+		}
+		
+		.selected {
+			background: #ddf;
+		}
+		
+		#arrows {
+			position: absolute;
+			top: 0;
+			right: 0;
+			background: #fff0;
+			width: 100%;
+			height: 100vh;
+		}
+
+		.arrow {
+			position: absolute;
+			background: #0000;
+		}
+
+		.arrow-shape1 {
+			position: absolute;
+			top: 0;
+			left: 0;
+			padding-left: 50%;
+			padding-top: 100%;
+			background: #000;
+		}
+
+		.arrow-shape2 {
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        padding-left: 50%;
+                        padding-top: 50%;
+                        background: #000;
+                }
+		
+	</style>
+
+	<script>
+		var selected = undefined;
+		function onRobotSelect() {		
+			//if (this.status != 'connected') return;
+			if (selected != undefined) {
+				selected.className = '';
+				commandRobot("StopStream");
+				console.log("stop stream "+selected.innerHTML);
+			}
+			
+			selected = this;
+			selected.className = 'selected';
+			commandRobot("StartStream");
+			console.log("start stream "+selected.innerHTML);
+
+			updateRobots();
+		}
+
+		function updateBotInfo() {
+			var date = new Date(selected.lastRegistred*1000);			
+			var infoW = document.getElementById('botInfo');
+			infoW.innerHTML = "<b>Name:</b> " + selected.innerHTML;
+			infoW.innerHTML += "<br><b>Registred the:</b> " + date.toString();
+			infoW.innerHTML += "<br><b>Ports:</b> " + selected.ports;
+
+			var req = new XMLHttpRequest();
+                        req.open( "GET", "getDeamonStatus.php?botID="+selected.botID, false );
+                        req.send( null );
+			var status = req.responseText;
+
+			infoW.innerHTML += "<br><b>Deamon:</b> " + status;
+		}
+	
+		function commandRobot(cmd) {
+			var req = new XMLHttpRequest();
+			req.open( "GET", "addCommand.php?botID="+selected.botID+"&cmd="+cmd, true );
+			req.send( null );
+		}
+	
+		function onGetRobotList () {
+			var data = this.responseText;
+			var list = document.getElementById('robots');
+			list.innerHTML = "";
+			for (var line of data.split('\n')) {
+				var parts = line.split('|');
+				if (parts.length < 3) continue;
+				var bot = document.createElement('button');
+				bot.innerHTML = parts[1];
+				bot.className = '';
+				bot.botID = parts[0];
+				bot.ports = [parts[3], parts[4]];
+				//bot.status = parts[2];
+				bot.lastRegistred = parts[6];
+				//if (parts[2] == 'connected') bot.style.color = '#0a0';
+				//else bot.style.color = '#888';
+				bot.onclick = onRobotSelect;
+				list.appendChild(bot);
+			}
+
+			updateBotInfo();
+		}
+	
+		function updateRobots() {
+			var req = new XMLHttpRequest();
+			req.addEventListener("load", onGetRobotList);
+			req.open( "GET", "getRobots.php", true );
+			req.send( null );
+		}
+		
+		var doStream = false;
+		
+		function onGetImage(req, recursive) {
+			var data = req.responseText;
+			var img = document.getElementById('video');
+
+			if (data.length < 1000) {
+				console.log("got bad image ("+data.length+"), skip");
+				img.src = "";	
+				if (recursive && doStream) getImage(true);
+				return;
+			}
+			
+			img.src = 'data:image/jpg;base64,' + data;
+			//img.src = 'tmp/frame0.jpg?' + new Date().getTime(); // TODO: just refresh in a timeout function!
+			img.alt = 'cam capture';
+			if (recursive && doStream) getImage(true);
+		}
+		
+		function getImage(recursive = false) {
+			if (selected === undefined) return;
+			var req = new XMLHttpRequest();
+			req.addEventListener("load", function() {
+					onGetImage(this,recursive);
+				});
+			req.open( "GET", "getImage.php?botID="+selected.botID, true );
+			req.send( null );
+		}
+		
+		function startStream() {
+			commandRobot("StartStream");
+			doStream = true;
+			getImage(true);
+		}
+		
+		function stopStream() {
+			commandRobot("StopStream");
+			doStream = false;
+		}
+
+		function addArrow(W, H, X, Y, A) {
+                        var a = document.createElement("div");
+                        var as = document.getElementById('arrows');
+                        a.className = 'arrow';
+			a.style.display = 'none';
+                        a.style.width = W;
+                        a.style.height = H;
+                        a.style.top = Y;
+                        a.style.right = X;
+			a.style.transform = "rotate("+A+"deg)";
+                        as.appendChild(a);
+
+			var i1 = document.createElement("i");
+			i1.className = "arrow-shape1";
+			a.appendChild(i1);
+
+			var i2 = document.createElement("i");
+                        i2.className = "arrow-shape2";
+                        a.appendChild(i2);
+			return a;
+		}
+
+		var theArrow = undefined;
+		var arrowRotation = '';
+		function addArrows() {
+			theArrow = addArrow('5vh', '5vh', 'calc(50% - 2.5vh)', '47.5vh', '45');
+			console.log('set arrow');
+			console.log(theArrow);
+		}
+
+		var currentCmd = '';
+		var time0 = 0;
+		function startCmd(cmd) {
+			currentCmd = cmd;
+			time0 = Date.now();
+			if (cmd == "Forward") arrowRotation = 'rotate(45deg)';
+			if (cmd == "Backward") arrowRotation = 'rotate(-135deg)';
+			if (cmd == "Left") arrowRotation = 'rotate(-45deg)';
+			if (cmd == "Right") arrowRotation = 'rotate(135deg)';
+			updateArrow(true);
+                        theArrow.style.display = 'block';
+		}
+
+		var lastT = 0;
+		function stopCmd() {
+			if (currentCmd == '') return;
+			theArrow.style.display = 'none';
+			var N = 1+Math.floor(lastT*30);
+			console.log(N);
+			var cmd = "";
+			for (var i=0; i<N; i++) {
+				cmd += "Cmd:"+currentCmd+"%0A"; //"\n"; 
+			}
+			//console.log(cmd);
+			commandRobot(cmd);
+			currentCmd = '';
+		}
+
+		function updateArrow(first) {
+			if (theArrow.style.display == 'none' && !first) return;
+			var T = 3;
+			var t = (Date.now() - time0)/1000.0/T;
+			t = Math.min(t, 1.0);
+			lastT = t;
+			var c = '';
+			if (t < 0.5) c = 'rgba('+(2*t*255).toString()+',255,0,0.5)';
+			else c = 'rgba(255,'+(255-2*(t-0.5)*255).toString()+',0,0.5)'
+			theArrow.children[0].style.background = c;
+			theArrow.children[1].style.background = c;
+			var x = '';
+			var y = '';
+			x = (-(0.0+t)*10).toString();
+			y = (-(0.0+t)*10).toString();
+			theArrow.style.transform = arrowRotation + ' translate('+x+'vh, '+y+'vh)';
+			setTimeout(updateArrow, 50);
+		}
+
+		function sendTestImage() {
+			
+			var req = new XMLHttpRequest();
+                        //req.addEventListener("load", onGetRobotList);
+                        req.open( "GET", "sendTestImage.php?botID="+selected.botID, true );
+                        req.send( null );
+		}
+	</script>
+</head>
+
+<body>
+	<div id='botPannel'>
+		<div id='robots'></div>
+		<div id='botInfo'></div>
+		<div id='botDebug'>
+			<button onclick='sendTestImage()'>Test Image</button>
+		</div>
+	</div>
+	<div id='interface'>
+		<img id='video'></img>
+		<div id='indicators'></div>
+		<div id='arrows'></div>
+		<div id='buttons'>
+			<button onclick='startStream()'>Start Cam</button>
+			<button onclick='stopStream()'>Stop Cam</button>
+			<button onpointerdown='startCmd("Left")'    >Left</button>
+			<button onpointerdown='startCmd("Forward")' >Forward</button>
+			<button onpointerdown='startCmd("Backward")'>Backward</button>
+			<button onpointerdown='startCmd("Right")'   >Right</button>
+		</div>
+	</div>
+	
+	<script>
+		updateRobots();
+		addArrows();
+		updateArrow();
+		window.addEventListener('pointerup', stopCmd);
+	</script>
+</body>
