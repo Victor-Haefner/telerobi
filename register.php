@@ -8,7 +8,7 @@
 include 'robot.php';
 
 // send via get request: 
-//    https:\\imi-dev.imi.kit.edu\...\register.php?name=bob&uid=13.13.23.13.45.45
+//    https:\\...\register.php?name=bob&uid=13.13.23.13.45.45
 $name = $_GET['name'];
 $uid = $_GET['uid'];
 
