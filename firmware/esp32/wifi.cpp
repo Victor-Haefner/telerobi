@@ -191,7 +191,7 @@ void RobotServer::registerAtServer() {
   String botID = getBoardID();
 
   Serial.println("Connected to server, register robot!");
-  String commands = get("pollCommands.php");
+  String commands = get("pollCommands.php?botID="+botID);
   String ports = get("register.php?uid="+botID+"&name="+settings->botName); // php: 'echo "ports: $bot->udpPort $bot->tcpPort";'
   Serial.println(commands);
   
