@@ -13,6 +13,9 @@ class Actuator {
 
 class Robot {
   private:
+    Configuration config;
+		Actuator* actuators[10] = {0};
+
     void setupPins();
 
     void updateActuators();
@@ -20,9 +23,6 @@ class Robot {
     void setMotor2(int dir);
 
 	public:
-		Actuator* actuators[10] = {0};
-    Configuration config;
-	
 		Robot(Configuration& config);
 		~Robot();
 		

@@ -39,11 +39,6 @@ void Robot::setup(int N_actuators) {
 	}
 }
 
-
-
-
-
-
 int Motor1Seq[5]={0,4,2,8,16}; //Sequence for BPM1 for forward 4 steps
 int Motor2Seq[5]={0,1,32,64,128}; //Sequence for BPM2 for forward 4 steps
 int motor1val;
@@ -60,15 +55,15 @@ void Robot::updateActuators() {
 
 void Robot::setMotor1(int dir) { 
   if (dir ==  0) motor1val = 0;
-  if (dir ==  1) motor1val=8+16;
-  if (dir == -1) motor1val=2+4;
+  if (dir ==  1) motor1val = 8+16;
+  if (dir == -1) motor1val = 2+4;
   updateActuators();
 }
 
 void Robot::setMotor2(int dir) { 
   if (dir ==  0) motor2val = 0;
-  if (dir ==  1) motor2val=1+32;
-  if (dir == -1) motor2val=64+128;
+  if (dir ==  1) motor2val = 1+32;
+  if (dir == -1) motor2val = 64+128;
   updateActuators();
 }
 
