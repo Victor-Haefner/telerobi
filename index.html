@@ -272,14 +272,45 @@
 			if (cmd == "Left") arrowRotation = 'rotate(-45deg)';
 			if (cmd == "Right") arrowRotation = 'rotate(135deg)';
 			updateArrow(true);
-                        theArrow.style.display = 'block';
+                       theArrow.style.display = 'block';
 		}
 		
 		function genMotion(dir, T) {
-			var N = 1+Math.floor(T*30);
+			var hexStr = (n=0)=>{
+				let r=0,d=n,v=[];
+				while (d>0) {
+					r=parseInt(d%16),d=parseInt(d/16),r=r===10?'a':r===11?'b':r===12?'c':r===13?'d':r===14?'e':r===15?'f':r,v.push(r.toString())
+				}
+				v.length === 1 && v.push('0');
+				return n===0?'00':v.reverse().join("")
+			}
+
+		
+			// "%0A" is "\n" - %0A is hex for the ASCII 10 \n
+			// use hex to pass parameters, actuator ID, speed and so on
+			
+			var speed_forw = "%7F"; // 127
+			var speed_stop = "%80"; // 128
+			var speed_back = "%81"; // 129
+			
+			var duration = hexStr(Math.round( T*100 ));
+			
 			var cmd = "";
-			for (var i=0; i<N; i++) {
-				cmd += "Cmd:"+dir+"%0A"; //"\n"; 
+			if (dir == "Forward") { // "AiSsDdOo" - actuator ID, speed, duration, offset
+				cmd += "Cmd:A%00S"+speed_forw+"D%"+duration+"O%00%0A"; 
+				cmd += "Cmd:A%01S"+speed_forw+"D%"+duration+"O%00%0A";
+			}
+			if (dir == "Backward") {
+				cmd += "Cmd:A%00S"+speed_back+"D%"+duration+"O%00%0A"; 
+				cmd += "Cmd:A%01S"+speed_back+"D%"+duration+"O%00%0A";
+			}
+			if (dir == "Left") {
+				cmd += "Cmd:A%00S"+speed_forw+"D%"+duration+"O%00%0A"; 
+				cmd += "Cmd:A%01S"+speed_back+"D%"+duration+"O%00%0A";
+			}
+			if (dir == "Right") {
+				cmd += "Cmd:A%00S"+speed_back+"D%"+duration+"O%00%0A"; 
+				cmd += "Cmd:A%01S"+speed_forw+"D%"+duration+"O%00%0A";
 			}
 			commandRobot(cmd);
 		}

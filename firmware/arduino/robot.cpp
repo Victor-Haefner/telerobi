@@ -8,7 +8,10 @@
 int motor1val;
 int motor2val;
 
-void Actuator::setSpeed(int speed) {
+void Actuator::setSpeed(byte s) {
+  int speed = s;
+  speed -= 128;
+
   if (config->type == TELEROBI) {  
     if (ID == 0) { 
       if (speed == 0) motor1val = 0;
@@ -67,7 +70,7 @@ void Robot::setup(int N_actuators) {
 	}
 }
 
-void Robot::setActuator(int i, int speed) {
+void Robot::setActuator(int i, byte speed) {
   if (i < 0 || i > 10) return;
   Actuator* a = actuators[i];
   if (a) a->setSpeed(speed);
