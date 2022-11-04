@@ -7,8 +7,9 @@ class Robot;
 
 class Command {
   public:
-    int actID = -1;
-    int dir = 0;
+    byte actID = -1;
+    byte dir = 0; // -128 - 128 
+    byte duration = 0; // 0-255 ms
     long start = 0;
     long stop = 0;
     bool started = false;

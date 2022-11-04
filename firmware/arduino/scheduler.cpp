@@ -60,17 +60,6 @@ void Scheduler::update() {
   }
 }
 
-void Scheduler::processCommand(String Cmd) { // TODO
-  char toSend[Cmd.length()+1];
-  Cmd.toCharArray(toSend,Cmd.length()+1);
-  
-  if (Cmd.substring(4,5) == "S") robot->drive("S");
-  if (Cmd.substring(4,5) == "F") robot->drive("D");
-  if (Cmd.substring(4,5) == "B") robot->drive("L");
-  if (Cmd.substring(4,5) == "L") robot->drive("R");
-  if (Cmd.substring(4,5) == "R") robot->drive("B");
-}
-
 const int Nbuff = 1024;
 char buff[Nbuff];
 int pointer = 0;
@@ -89,3 +78,34 @@ void Scheduler::processSerialInput(char c) {
     pointer = pointer % (Nbuff - 1);
   }
 }
+
+/** Command syntax
+AiSsDdOo # set Actor i Speed s Duration d Offset o
+LiRrGgBb # set LED i RGB (NOT YET IMPLEMENTED)
+
+schema: byte pairs, 1 byte label and 1 byte value
+first byte, A for actuator, L for LED
+second byte is index 0 to 255
+then follow parameters
+*/
+
+void Scheduler::processCommand(String Cmd) {
+  Cmd = Cmd.substring(4); // remove 'cmd:', maybe dont send it from the esp
+  int N = Cmd.length()/2;
+
+  Command command;
+  for (int i=0; i<2*N; i+=2) {
+    char label = Cmd[i];
+    byte param = Cmd[i+1];
+    if (label == 'A') command.actID = param;
+    if (label == 'S') command.dir = param;
+    if (label == 'D') command.duration = param;
+    if (label == 'O') command.start = millis() + param;
+  }
+  command.stop = command.start + command.duration;
+  actuators[command.actID]->push(command);
+}
+
+
+
+
