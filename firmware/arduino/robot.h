@@ -1,34 +1,32 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 
-#include "config.h"
+class Configuration;
 
 class Actuator {
-	public:		
-		Actuator();
+	public:
+    int ID = -1;
+    Configuration* config = 0;
+
+		Actuator(int ID, Configuration* config);
 		~Actuator();
 		
-		void runFor(double Tms);
+		void setSpeed(int speed);
 };	
 
 class Robot {
   private:
-    Configuration config;
+    Configuration* config = 0;
 		Actuator* actuators[10] = {0};
 
     void setupPins();
 
-    void updateActuators();
-    void setMotor1(int dir);
-    void setMotor2(int dir);
-
 	public:
-		Robot(Configuration& config);
+		Robot(Configuration* config);
 		~Robot();
 		
 		void setup(int N_actuators);
-		void setActuator(int i, int dir);
-    void drive(String line);
+		void setActuator(int i, int speed);
 };
 
 #endif //ROBOT_H

@@ -3,8 +3,16 @@
 
 #include <Arduino.h>
 
+enum ROBOT {
+  TELEROBI = 0,
+  ELEGOO  
+};
+
 class Configuration {
   public:
+    ROBOT type = TELEROBI;
+    int N_actuators = 2;
+
     int LOAD = 17;
 
     //Bit positions in the Arduino UNO WIFI Rev 2 micro controller output
@@ -30,6 +38,6 @@ class Configuration {
     int MOTOR4_B = 7; //Q7
 };
 
-Configuration getConfig(String botType);
+Configuration* getConfig(String botType);
 
 #endif //CONFIG_H

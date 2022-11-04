@@ -10,7 +10,7 @@
 #define txpin 13                                                               //set the TX pin to pin 13
 SoftwareSerial espInput(rxpin, txpin);
 
-Configuration config;
+Configuration* config = 0;
 Robot* robot = 0;
 Scheduler* scheduler = 0;
 
@@ -18,14 +18,15 @@ void setup() {
   Serial.begin(115200);
   espInput.begin(9600); 
   Serial.println("Arduino setup starting");
+
+  String bot = "Telerobi";
   
-  config = getConfig("Telerobi");
+  config = getConfig(bot);
   robot = new Robot(config);
-  scheduler = new Scheduler(robot);
+  robot->setup(config->N_actuators);
+  scheduler = new Scheduler(robot, config);
 
   Serial.println("Arduino setup complete");
-  delay(2000); 
-  robot->drive("S"); 
   delay(2000);
 }
 

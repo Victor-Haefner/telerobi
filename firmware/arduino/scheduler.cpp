@@ -1,5 +1,6 @@
 #include "scheduler.h"
 #include "robot.h"
+#include "config.h"
 
 void CmdQueue::push(const Command& cmd) {
   lastAdded++;
@@ -11,7 +12,7 @@ void CmdQueue::push(const Command& cmd) {
 
 // ---- scheduler ----
 
-Scheduler::Scheduler(Robot* b) : robot(b) {}
+Scheduler::Scheduler(Robot* b, Configuration* c) : config(c), robot(b) {}
 Scheduler::~Scheduler();
 
 void Scheduler::update() {
@@ -53,7 +54,7 @@ void Scheduler::update() {
       }
 
       // start command
-      robot->setActuator(i, cmd.dir);
+      robot->setActuator(i, cmd.speed);
       queue->currentStarted = cmd.start;
       cmd.started = true;
     }
@@ -98,11 +99,14 @@ void Scheduler::processCommand(String Cmd) {
     char label = Cmd[i];
     byte param = Cmd[i+1];
     if (label == 'A') command.actID = param;
-    if (label == 'S') command.dir = param;
+    if (label == 'S') command.speed = param;
     if (label == 'D') command.duration = param;
     if (label == 'O') command.start = millis() + param;
   }
   command.stop = command.start + command.duration;
+
+  int caID = command.actID;
+  if (caID < 0 || caID > 10) return;
   actuators[command.actID]->push(command);
 }
 
