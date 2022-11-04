@@ -274,19 +274,21 @@
 			updateArrow(true);
                         theArrow.style.display = 'block';
 		}
+		
+		function genMotion(dir, T) {
+			var N = 1+Math.floor(T*30);
+			var cmd = "";
+			for (var i=0; i<N; i++) {
+				cmd += "Cmd:"+dir+"%0A"; //"\n"; 
+			}
+			commandRobot(cmd);
+		}
 
 		var lastT = 0;
 		function stopCmd() {
 			if (currentCmd == '') return;
 			theArrow.style.display = 'none';
-			var N = 1+Math.floor(lastT*30);
-			console.log(N);
-			var cmd = "";
-			for (var i=0; i<N; i++) {
-				cmd += "Cmd:"+currentCmd+"%0A"; //"\n"; 
-			}
-			//console.log(cmd);
-			commandRobot(cmd);
+			genMotion(currentCmd, currentCmd);
 			currentCmd = '';
 		}
 
