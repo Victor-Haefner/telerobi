@@ -12,27 +12,31 @@ void CmdQueue::push(const Command& cmd) {
 
 // ---- scheduler ----
 
-Scheduler::Scheduler(Robot* b, Configuration* c) : config(c), robot(b) {}
+Scheduler::Scheduler(Robot* b, Configuration* c) : config(c), robot(b) {
+  for (int i=0; i<config->N_actuators; i++) {
+    actuators[i] = new CmdQueue();   
+    if (actuators[i] == 0) Serial.println("Mem fail 3"); 
+  }
+}
+
 Scheduler::~Scheduler();
 
 void Scheduler::update() {
   unsigned long t = millis();
 
-  for (int i=0; i<10; i++) { // for each actuator command queue
+  for (int i=0; i<config->N_actuators; i++) { // for each actuator command queue
     CmdQueue* queue = actuators[i];
-    Serial.println(String(i)+", "+String(int(queue)));
     if (queue == 0) continue;
     if (!queue->active) continue;
 
     if (queue->lastStop <= t) {
       queue->active = false;
-      robot->setActuator(i, 0); // safeguard stop
+      robot->setActuator(i, 128); // safeguard stop
     }
 
     for (int j=0; j<CmdQueue::N; j++) { // for each command
       Command& cmd = queue->commands[j];
-      Serial.println(String(i)+", "+String(j)+", "+String(cmd.actID));
-      if (cmd.actID == -1) continue;
+      if (cmd.actID == 255) continue;
       if (cmd.start > t) continue; // not yet ment to start
 
       if (cmd.start < queue->currentStarted) { // another command has taken precedence, disable this one
@@ -44,7 +48,7 @@ void Scheduler::update() {
         if (cmd.start != queue->currentStarted) cmd.actID = -1; // another command has taken over, disable this one
           
         if (cmd.stop <= t) { // needs to stop!
-          robot->setActuator(i, 0); 
+          robot->setActuator(i, 128); 
           cmd.actID = -1;
         }
         continue;
@@ -56,7 +60,6 @@ void Scheduler::update() {
       }
 
       // start command
-      Serial.println("Start cmd!");
       robot->setActuator(i, cmd.speed);
       queue->currentStarted = cmd.start;
       cmd.started = true;
@@ -68,15 +71,15 @@ const int Nbuff = 64;
 char buff[Nbuff];
 int pointer = 0;
 
-void Scheduler::processSerialInput(char c) { // TODO!!!!!!!
+void Scheduler::processSerialInput(char c) {
   //Serial.write(c);               // print it out the serial monitor
   buff[pointer] = c;
   pointer++;
       
-  if (c == '\n') {                // if the byte is a newline character
+  if (c == '\n') {                // if the byte is a newline character TODO: this may be a binary value!!
     buff[pointer - 1] = 0;
-    String data = String(buff);
-    //processCommand(data);
+    string data(buff, pointer-1);// = String(buff);
+    processCommand(data);
     pointer = 0;
   } else {
     pointer = pointer % (Nbuff - 1);
@@ -98,18 +101,28 @@ string::string(const char* d, int N) {
   if (N == -1) for (const char* i=d; *i != 0; i++) length++;
   else length = N;
   data = new byte[length];
+  if (data == 0) Serial.println("Mem fail 1");
   memcpy(data, d, length);
 }
 
+string::string(const string& other) {
+  copy(other);
+}
+
 string::~string() {
-  if (data) delete data;
+  if (data) delete[] data;
 }
 
 string& string::operator=(const string& other) {
+    copy(other);
+    return *this;
+}
+
+void string::copy(const string& other) {
     length = other.length;
     data = new byte[length];
+    if (data == 0) Serial.println("Mem fail 2");
     memcpy(data, other.data, length);
-    return *this;
 }
 
 byte string::operator [](int i) const {return data[i];}
@@ -142,11 +155,12 @@ void Scheduler::processCommand(string Cmd) {
     if (label == 'D') command.duration = param;
     if (label == 'O') command.start = millis() + param;
   }
-  command.stop = command.start + int(command.duration);
+  command.stop = command.start + int(command.duration)*speedFactor;
 
   int caID = command.actID;
   if (caID < 0 || caID > 10) return;
-  actuators[command.actID]->push(command);
+  auto& actuator = actuators[command.actID];
+  if (actuator) actuator->push(command);
 }
 
 

@@ -30,8 +30,7 @@ void setup() {
   Serial.println("Uno started");
   //delay(2000);
 
-  string cmd = scheduler->genActorCommand(0, 129, 2, 0); // set Actor i, Speed s, Duration d, Offset o
-  //string cmd = scheduler->genActorCommand('a', 'b', 'c', 'd'); // set Actor i, Speed s, Duration d, Offset o
+  string cmd = scheduler->genActorCommand(0, 129, 40, 0); // set Actor i, Speed s, Duration d, Offset o
   scheduler->processCommand(cmd); 
 }
 

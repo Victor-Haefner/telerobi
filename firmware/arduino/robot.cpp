@@ -11,6 +11,7 @@ int motor2val;
 void Actuator::setSpeed(byte s) {
   int speed = s;
   speed -= 128;
+  Serial.println("setActuator " + String(ID) + ", speed: " + String(speed));
 
   if (config->type == TELEROBI) {  
     if (ID == 0) { 
@@ -76,7 +77,7 @@ void Robot::setup(int N_actuators) {
   int N = min(10, N_actuators);
 	for (int i=0; i<N; i++) {
 		actuators[i] = new Actuator(i, config);
-		setActuator(i, 0);
+		setActuator(i, 128);
 	}
 }
 

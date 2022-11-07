@@ -12,8 +12,11 @@ class string {
     byte* data = 0;
 
     string(const char* d, int N = -1); 
+    string(const string& other);
     ~string(); 
 
+    //string& operator=(string&& other) noexcept;
+    void copy(const string& other);
     string& operator=(const string& other);
     byte operator [](int i) const;
     byte & operator [](int i);
@@ -44,6 +47,7 @@ class CmdQueue {
 
 class Scheduler {
   private:
+    const static int speedFactor = 100; // from byte to ms
     Configuration* config = 0;
     Robot* robot = 0;
 		CmdQueue* actuators[10] = {0};
