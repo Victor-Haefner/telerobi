@@ -8,10 +8,8 @@
 int motor1val;
 int motor2val;
 
-void Actuator::setSpeed(byte s) {
-  int speed = s;
-  speed -= 128;
-  Serial.println("setActuator " + String(ID) + ", speed: " + String(speed));
+void Actuator::setSpeed(int speed) {
+  //Serial.println("setSpeed " + String(ID) + ", speed: " + String(speed));
 
   if (config->type == TELEROBI) {  
     if (ID == 0) { 
@@ -31,8 +29,26 @@ void Actuator::setSpeed(byte s) {
     digitalWrite(config->DIR_LATCH, HIGH);                    //schreiben stoppen, register scharf schalten
   }
 
-  if (config->type == ELEGOO) { // TODO
-    ;
+  if (config->type == ELEGOO) { // TODO 
+    if (speed == 0) digitalWrite(config->DIR_CLK, LOW);
+
+    if (ID == 0) {
+      motor1val = speed;
+      if (speed > 0) digitalWrite(config->DIR_EN, HIGH);
+      if (speed < 0) digitalWrite(config->DIR_EN, LOW);
+      analogWrite(config->PWM0A, abs(speed));   
+    }
+
+    if (ID == 1) {
+      motor2val = speed;
+      if (speed > 0) digitalWrite(config->DIR_SER, HIGH);
+      if (speed < 0) digitalWrite(config->DIR_SER, LOW); 
+      analogWrite(config->PWM0B, abs(speed));
+    }
+
+    // test for standby
+    if (motor1val == 0 && motor2val == 0) digitalWrite(config->DIR_CLK, LOW);
+    else digitalWrite(config->DIR_CLK, HIGH);
   }
 }
 
@@ -77,11 +93,11 @@ void Robot::setup(int N_actuators) {
   int N = min(10, N_actuators);
 	for (int i=0; i<N; i++) {
 		actuators[i] = new Actuator(i, config);
-		setActuator(i, 128);
+		setActuator(i, 0);
 	}
 }
 
-void Robot::setActuator(int i, byte speed) {
+void Robot::setActuator(int i, int speed) {
   if (i < 0 || i > 10) return;
   Actuator* a = actuators[i];
   if (a) a->setSpeed(speed);

@@ -30,8 +30,21 @@ void setup() {
   Serial.println("Uno started");
   //delay(2000);
 
-  string cmd = scheduler->genActorCommand(0, 129, 40, 0); // set Actor i, Speed s, Duration d, Offset o
-  scheduler->processCommand(cmd); 
+  /*string cmd = scheduler->genActorCommand(1, 180, 10, 0); // set Actor i, Speed s, Duration d, Offset o
+  //scheduler->processCommand(cmd); 
+  for (int i=0; i<cmd.length; i++) scheduler->processSerialInput(cmd[i]);
+  scheduler->processSerialInput(0);
+  scheduler->processSerialInput('\n');
+  cmd = scheduler->genActorCommand(1, 220, 10, 10); // set Actor i, Speed s, Duration d, Offset o
+  //scheduler->processCommand(cmd); 
+  for (int i=0; i<cmd.length; i++) scheduler->processSerialInput(cmd[i]);
+  scheduler->processSerialInput(0);
+  scheduler->processSerialInput('\n');
+  cmd = scheduler->genActorCommand(1, 250, 10, 20); // set Actor i, Speed s, Duration d, Offset o
+  //scheduler->processCommand(cmd);
+  for (int i=0; i<cmd.length; i++) scheduler->processSerialInput(cmd[i]);
+  scheduler->processSerialInput(0);
+  scheduler->processSerialInput('\n');*/
 }
 
 void loop() {

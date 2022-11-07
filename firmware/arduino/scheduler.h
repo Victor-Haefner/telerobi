@@ -27,8 +27,8 @@ class string {
 class Command {
   public:
     byte actID = -1;
-    byte speed = 0; // -128 - 128 
-    byte duration = 0; // 0-255 ms
+    int speed = 0;
+    int duration = 0;
     unsigned long start = 0;
     unsigned long stop = 0;
     bool started = false;
@@ -47,7 +47,8 @@ class CmdQueue {
 
 class Scheduler {
   private:
-    const static int speedFactor = 100; // from byte to ms
+    const static int timeMultiplier = 100; // from byte to ms, for the duration passed in commands
+    const static int speedMultiplier = 2;
     Configuration* config = 0;
     Robot* robot = 0;
 		CmdQueue* actuators[10] = {0};
@@ -56,7 +57,7 @@ class Scheduler {
     Scheduler(Robot* robot, Configuration* config);
     ~Scheduler();
 
-    void processSerialInput(char c);
+    void processSerialInput(byte c);
     void processCommand(string Cmd);
     void update();
 

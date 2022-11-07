@@ -32,7 +32,7 @@ Configuration* getConfig(String botType) {
 
   if (botType == "Elegoo") { // TODO
     c->type = ELEGOO;
-    c->N_actuators = 4;
+    c->N_actuators = 2;
 
     c->PWM0A = 5;
     c->PWM0B = 6;

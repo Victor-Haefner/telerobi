@@ -31,7 +31,7 @@ void Scheduler::update() {
 
     if (queue->lastStop <= t) {
       queue->active = false;
-      robot->setActuator(i, 128); // safeguard stop
+      robot->setActuator(i, 0); // safeguard stop
     }
 
     for (int j=0; j<CmdQueue::N; j++) { // for each command
@@ -48,7 +48,7 @@ void Scheduler::update() {
         if (cmd.start != queue->currentStarted) cmd.actID = -1; // another command has taken over, disable this one
           
         if (cmd.stop <= t) { // needs to stop!
-          robot->setActuator(i, 128); 
+          robot->setActuator(i, 0); 
           cmd.actID = -1;
         }
         continue;
@@ -71,14 +71,15 @@ const int Nbuff = 64;
 char buff[Nbuff];
 int pointer = 0;
 
-void Scheduler::processSerialInput(char c) {
-  //Serial.write(c);               // print it out the serial monitor
+void Scheduler::processSerialInput(byte c) {
+  //Serial.println( " processSerialInput: "+String(int(c)) );               // print it out the serial monitor
   buff[pointer] = c;
   pointer++;
       
-  if (c == '\n') {                // if the byte is a newline character TODO: this may be a binary value!!
+  if (pointer > 1 && c == '\n' && buff[pointer-2] == 0) {
     buff[pointer - 1] = 0;
-    string data(buff, pointer-1);// = String(buff);
+    string data(buff, pointer-2);
+    //Serial.println("found newline!! "+String(pointer-2));
     processCommand(data);
     pointer = 0;
   } else {
@@ -151,14 +152,17 @@ void Scheduler::processCommand(string Cmd) {
     byte param = Cmd[i+1];
 
     if (label == 'A') command.actID = param;
-    if (label == 'S') command.speed = param;
-    if (label == 'D') command.duration = param;
-    if (label == 'O') command.start = millis() + param;
+    if (label == 'S') command.speed = (int(param)-128)*speedMultiplier;
+    if (label == 'D') command.duration = int(param)*timeMultiplier;
+    if (label == 'O') command.start = millis() + int(param)*timeMultiplier;
   }
-  command.stop = command.start + int(command.duration)*speedFactor;
+  command.stop = command.start + command.duration;
 
   int caID = command.actID;
   if (caID < 0 || caID > 10) return;
+
+  //Serial.println(" queue cmd, speed: "+String(command.speed)+", actuator: "+String(command.actID)+", duration: "+String(command.duration)+", start: "+String(command.start)+", stop: "+String(command.stop));
+  
   auto& actuator = actuators[command.actID];
   if (actuator) actuator->push(command);
 }

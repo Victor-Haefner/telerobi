@@ -13,7 +13,7 @@ class Actuator {
 		Actuator(int ID, Configuration* config);
 		~Actuator();
 		
-		void setSpeed(byte speed);
+		void setSpeed(int speed);
 };	
 
 class Robot {
@@ -28,7 +28,7 @@ class Robot {
 		~Robot();
 		
 		void setup(int N_actuators);
-		void setActuator(int i, byte speed);
+		void setActuator(int i, int speed);
 };
 
 #endif //ROBOT_H
