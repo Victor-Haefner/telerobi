@@ -39,22 +39,32 @@ Actuator::Actuator(int i, Configuration* c) : ID(i), config(c) {}
 Actuator::~Actuator() {}
 
 void Robot::setupPins() {
-  pinMode(9, OUTPUT);      // set the LED pin mode
-  pinMode(config->LOAD,OUTPUT); //setze impulslast-pin
+  if (config->type == TELEROBI) {
+    pinMode(9, OUTPUT);      // set the LED pin mode
+    pinMode(config->LOAD,OUTPUT); //setze impulslast-pin
 
-  //Pins für Treiberboard initialisieren
-  pinMode(config->DIR_EN, OUTPUT);
-  pinMode(config->DIR_SER, OUTPUT);
-  pinMode(config->DIR_LATCH, OUTPUT);
-  pinMode(config->DIR_CLK, OUTPUT);
-  pinMode(config->PWM0A, OUTPUT);
-  pinMode(config->PWM0B, OUTPUT);
-  digitalWrite(config->PWM0A, HIGH);
-  digitalWrite(config->PWM0B, HIGH);
-  pinMode(config->PWM2A, OUTPUT);
-  pinMode(config->PWM2B, OUTPUT);
-  digitalWrite(config->PWM2A, HIGH);
-  digitalWrite(config->PWM2B, HIGH);
+    //Pins für Treiberboard initialisieren
+    pinMode(config->DIR_EN, OUTPUT);
+    pinMode(config->DIR_SER, OUTPUT);
+    pinMode(config->DIR_LATCH, OUTPUT);
+    pinMode(config->DIR_CLK, OUTPUT);
+    pinMode(config->PWM0A, OUTPUT);
+    pinMode(config->PWM0B, OUTPUT);
+    digitalWrite(config->PWM0A, HIGH);
+    digitalWrite(config->PWM0B, HIGH);
+    pinMode(config->PWM2A, OUTPUT);
+    pinMode(config->PWM2B, OUTPUT);
+    digitalWrite(config->PWM2A, HIGH);
+    digitalWrite(config->PWM2B, HIGH);
+  }
+
+  if (config->type == ELEGOO) {
+    pinMode(config->PWM0A, OUTPUT); // PIN_Motor_PWMA
+    pinMode(config->PWM0B, OUTPUT); // PIN_Motor_PWMB
+    pinMode(config->DIR_EN, OUTPUT); // PIN_Motor_AIN_1
+    pinMode(config->DIR_SER, OUTPUT); // PIN_Motor_BIN_1
+    pinMode(config->DIR_CLK, OUTPUT); // PIN_Motor_STBY
+  }
 }
 
 Robot::Robot(Configuration* c) : config(c) {}

@@ -4,7 +4,7 @@
 
 void CmdQueue::push(const Command& cmd) {
   lastAdded++;
-  lastAdded = lastAdded%10;
+  lastAdded = lastAdded%CmdQueue::N;
   commands[lastAdded] = cmd;
   lastStop = max(lastStop, cmd.stop);
   active = true;
@@ -16,10 +16,11 @@ Scheduler::Scheduler(Robot* b, Configuration* c) : config(c), robot(b) {}
 Scheduler::~Scheduler();
 
 void Scheduler::update() {
-  long t = millis();
+  unsigned long t = millis();
 
   for (int i=0; i<10; i++) { // for each actuator command queue
     CmdQueue* queue = actuators[i];
+    Serial.println(String(i)+", "+String(int(queue)));
     if (queue == 0) continue;
     if (!queue->active) continue;
 
@@ -28,8 +29,9 @@ void Scheduler::update() {
       robot->setActuator(i, 0); // safeguard stop
     }
 
-    for (int j=0; j<10; j++) { // for each command
+    for (int j=0; j<CmdQueue::N; j++) { // for each command
       Command& cmd = queue->commands[j];
+      Serial.println(String(i)+", "+String(j)+", "+String(cmd.actID));
       if (cmd.actID == -1) continue;
       if (cmd.start > t) continue; // not yet ment to start
 
@@ -54,6 +56,7 @@ void Scheduler::update() {
       }
 
       // start command
+      Serial.println("Start cmd!");
       robot->setActuator(i, cmd.speed);
       queue->currentStarted = cmd.start;
       cmd.started = true;
@@ -61,11 +64,11 @@ void Scheduler::update() {
   }
 }
 
-const int Nbuff = 1024;
+const int Nbuff = 64;
 char buff[Nbuff];
 int pointer = 0;
 
-void Scheduler::processSerialInput(char c) {
+void Scheduler::processSerialInput(char c) { // TODO!!!!!!!
   //Serial.write(c);               // print it out the serial monitor
   buff[pointer] = c;
   pointer++;
@@ -73,7 +76,7 @@ void Scheduler::processSerialInput(char c) {
   if (c == '\n') {                // if the byte is a newline character
     buff[pointer - 1] = 0;
     String data = String(buff);
-    processCommand(data);
+    //processCommand(data);
     pointer = 0;
   } else {
     pointer = pointer % (Nbuff - 1);
@@ -90,20 +93,56 @@ second byte is index 0 to 255
 then follow parameters
 */
 
-void Scheduler::processCommand(String Cmd) {
-  Cmd = Cmd.substring(4); // remove 'cmd:', maybe dont send it from the esp
-  int N = Cmd.length()/2;
+string::string(const char* d, int N) {
+  if (!d || N == 0) return;
+  if (N == -1) for (const char* i=d; *i != 0; i++) length++;
+  else length = N;
+  data = new byte[length];
+  memcpy(data, d, length);
+}
+
+string::~string() {
+  if (data) delete data;
+}
+
+string& string::operator=(const string& other) {
+    length = other.length;
+    data = new byte[length];
+    memcpy(data, other.data, length);
+    return *this;
+}
+
+byte string::operator [](int i) const {return data[i];}
+byte & string::operator [](int i) {return data[i];}
+
+void string::print() {
+  for (int i=0; i<length; i++) Serial.print(char(data[i]));
+  Serial.println("");
+}
+
+string Scheduler::genActorCommand(byte i, byte s, byte d, byte o) {
+  string cmd("cmd:AiSsDdOo");
+  cmd[5] = char(i);
+  cmd[7] = char(s);
+  cmd[9] = char(d);
+  cmd[11] = char(o);
+  return cmd;
+}
+
+void Scheduler::processCommand(string Cmd) {
+  int N = Cmd.length/2;
 
   Command command;
-  for (int i=0; i<2*N; i+=2) {
+  for (int i=4; i<2*N; i+=2) { // start at 2 to skip 'cmd:' at the beginning!
     char label = Cmd[i];
     byte param = Cmd[i+1];
+
     if (label == 'A') command.actID = param;
     if (label == 'S') command.speed = param;
     if (label == 'D') command.duration = param;
     if (label == 'O') command.start = millis() + param;
   }
-  command.stop = command.start + command.duration;
+  command.stop = command.start + int(command.duration);
 
   int caID = command.actID;
   if (caID < 0 || caID > 10) return;

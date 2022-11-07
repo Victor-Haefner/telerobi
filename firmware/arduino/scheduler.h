@@ -6,22 +6,38 @@
 class Robot;
 class Configuration;
 
+class string {
+  public:
+    int length = 0;
+    byte* data = 0;
+
+    string(const char* d, int N = -1); 
+    ~string(); 
+
+    string& operator=(const string& other);
+    byte operator [](int i) const;
+    byte & operator [](int i);
+
+    void print();
+};
+
 class Command {
   public:
     byte actID = -1;
     byte speed = 0; // -128 - 128 
     byte duration = 0; // 0-255 ms
-    long start = 0;
-    long stop = 0;
+    unsigned long start = 0;
+    unsigned long stop = 0;
     bool started = false;
 };
 
 class CmdQueue {
   public:
-    Command commands[10];
+    const static int N = 4;
+    Command commands[N];
     int lastAdded = -1;
-    long lastStop = 0;
-    long currentStarted = 0;
+    unsigned long lastStop = 0;
+    unsigned long currentStarted = 0;
     bool active = false;
     void push(const Command& cmd);
 };
@@ -37,8 +53,10 @@ class Scheduler {
     ~Scheduler();
 
     void processSerialInput(char c);
-    void processCommand(String Cmd);
+    void processCommand(string Cmd);
     void update();
+
+    string genActorCommand(byte i, byte s, byte d, byte o);
 };
 
 #endif //SCHEDULER_H

@@ -17,17 +17,22 @@ Scheduler* scheduler = 0;
 void setup() {
   Serial.begin(115200);
   espInput.begin(9600); 
-  Serial.println("Arduino setup starting");
 
-  String bot = "Telerobi";
+  // TODO: config! ..or maybe identify the board??
+  String bot = "Elegoo";
+  //String bot = "Telerobi";
   
   config = getConfig(bot);
   robot = new Robot(config);
   robot->setup(config->N_actuators);
   scheduler = new Scheduler(robot, config);
 
-  Serial.println("Arduino setup complete");
-  delay(2000);
+  Serial.println("Uno started");
+  //delay(2000);
+
+  string cmd = scheduler->genActorCommand(0, 129, 2, 0); // set Actor i, Speed s, Duration d, Offset o
+  //string cmd = scheduler->genActorCommand('a', 'b', 'c', 'd'); // set Actor i, Speed s, Duration d, Offset o
+  scheduler->processCommand(cmd); 
 }
 
 void loop() {
