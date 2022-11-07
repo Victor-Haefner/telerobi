@@ -15,12 +15,14 @@ Robot* robot = 0;
 Scheduler* scheduler = 0;
 
 void setup() {
-  Serial.begin(115200);
-  espInput.begin(9600); 
-
   // TODO: config! ..or maybe identify the board??
   String bot = "Elegoo";
   //String bot = "Telerobi";
+
+  if (bot == "Telerobi") {
+    Serial.begin(115200);
+    espInput.begin(9600); 
+  }
   
   config = getConfig(bot);
   robot = new Robot(config);
@@ -50,9 +52,18 @@ void setup() {
 void loop() {
   scheduler->update();
 
-  if (!espInput.available()) return;
-  while (espInput.available() > 0) {
-    char c = espInput.read();      // read a byte, then
-    scheduler->processSerialInput(c);
+  if (config->type == TELEROBI) {
+    while (espInput.available() > 0) {
+      char c = espInput.read();      // read a byte
+      scheduler->processSerialInput(c);
+    }
   }
+
+  if (config->type == ELEGOO) {
+    while (Serial.available() > 0) {
+      char c = Serial.read();      // read a byte
+      scheduler->processSerialInput(c);
+    }
+  }
+
 }
