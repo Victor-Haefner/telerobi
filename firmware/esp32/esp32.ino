@@ -51,9 +51,9 @@ void setup() {
   botServer.start(&settings, &state);
   configurator.start(&settings, &state);
   
-  /*Serial.println(" init camera");
-  if (settings.botModel == "Elegoo") init_camera("M5STACK_WIDE");
-  if (settings.botModel == "Telerobi") init_camera("AI_THINKER");*/
+  Serial.println(" init camera");
+  //if (settings.botModel == "Elegoo") init_camera("M5STACK_WIDE");
+  if (settings.botModel == "Telerobi") init_camera("AI_THINKER");
   Serial.println("Finished setup");
 }
 
@@ -90,7 +90,7 @@ void loop() {
   if (state.state == "unregistred") botServer.registerAtServer();
   
   botServer.pollCommands(processMessage); // TODO: induces lag in camera stream!
-  //if (state.doStream) capture_cam(on_stream_capture);
+  if (state.doStream) capture_cam(on_stream_capture);
   configurator.processHTTPinput(); // local network, SSID: trineBot
   
   if (state.needsSSIDConnect) botServer.connectSSID();

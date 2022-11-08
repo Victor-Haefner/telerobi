@@ -5,6 +5,8 @@
 #include "trine_cam.h"
 #include "camera_pins.h"
 
+bool camInitiated = false;
+
 void init_camera(String camModel) {
   camera_config_t config = getCameraConfig(camModel);
 
@@ -25,9 +27,12 @@ void init_camera(String camModel) {
   s->set_framesize(s, FRAMESIZE_CIF);//_SVGA); // 800x600
   s->set_vflip(s, 0);
   s->set_hmirror(s, 0);
+  camInitiated = true;
 }
 
 void capture_cam(CameraCb handlerCb) {
+    if (!camInitiated) return;
+      
     size_t _jpg_buf_len = 0;
     uint8_t* _jpg_buf = NULL;
 
