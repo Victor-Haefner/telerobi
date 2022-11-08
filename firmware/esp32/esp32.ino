@@ -52,6 +52,7 @@ void setup() {
   configurator.start(&settings, &state);
   
   Serial.println(" init camera");
+  if (settings.botModel == "Elegoo") init_camera_elegoo();
   //if (settings.botModel == "Elegoo") init_camera("M5STACK_WIDE");
   if (settings.botModel == "Telerobi") init_camera("AI_THINKER");
   Serial.println("Finished setup");

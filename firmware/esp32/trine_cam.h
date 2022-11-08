@@ -14,6 +14,7 @@ struct Image {
 
 typedef void (*CameraCb)(Image img);
 
+void init_camera_elegoo();
 void init_camera(String camModel);
 void capture_cam(CameraCb handlerCb);
 
