@@ -289,29 +289,30 @@
 			// "%0A" is "\n" - %0A is hex for the ASCII 10 \n
 			// use hex to pass parameters, actuator ID, speed and so on
 			
-			var speed_forw = "%7F"; // 127
-			var speed_stop = "%80"; // 128
-			var speed_back = "%81"; // 129
+			var speed_forw = "%D0";
+			var speed_stop = "%80";
+			var speed_back = "%40";
 			
-			var duration = hexStr(Math.round( T*100 ));
-			
-			var cmd = "";
+			var duration = "%"+hexStr(Math.round( T*30 ));
+
+			var cmd = "";			
 			if (dir == "Forward") { // "AiSsDdOo" - actuator ID, speed, duration, offset
-				cmd += "Cmd:A%00S"+speed_forw+"D%"+duration+"O%00%0A"; 
-				cmd += "Cmd:A%01S"+speed_forw+"D%"+duration+"O%00%0A";
+				cmd += "Cmd:A%00S"+speed_forw+"D"+duration+"O%00%00%0A"; 
+				cmd += "Cmd:A%01S"+speed_forw+"D"+duration+"O%00%00%0A";
 			}
 			if (dir == "Backward") {
-				cmd += "Cmd:A%00S"+speed_back+"D%"+duration+"O%00%0A"; 
-				cmd += "Cmd:A%01S"+speed_back+"D%"+duration+"O%00%0A";
+				cmd += "Cmd:A%00S"+speed_back+"D"+duration+"O%00%00%0A"; 
+				cmd += "Cmd:A%01S"+speed_back+"D"+duration+"O%00%00%0A";
 			}
 			if (dir == "Left") {
-				cmd += "Cmd:A%00S"+speed_forw+"D%"+duration+"O%00%0A"; 
-				cmd += "Cmd:A%01S"+speed_back+"D%"+duration+"O%00%0A";
+				cmd += "Cmd:A%00S"+speed_forw+"D"+duration+"O%00%00%0A"; 
+				cmd += "Cmd:A%01S"+speed_back+"D"+duration+"O%00%00%0A";
 			}
 			if (dir == "Right") {
-				cmd += "Cmd:A%00S"+speed_back+"D%"+duration+"O%00%0A"; 
-				cmd += "Cmd:A%01S"+speed_forw+"D%"+duration+"O%00%0A";
+				cmd += "Cmd:A%00S"+speed_back+"D"+duration+"O%00%00%0A"; 
+				cmd += "Cmd:A%01S"+speed_forw+"D"+duration+"O%00%00%0A";
 			}
+
 			commandRobot(cmd);
 		}
 
@@ -319,7 +320,7 @@
 		function stopCmd() {
 			if (currentCmd == '') return;
 			theArrow.style.display = 'none';
-			genMotion(currentCmd, currentCmd);
+			genMotion(currentCmd, lastT);
 			currentCmd = '';
 		}
 

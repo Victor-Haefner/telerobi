@@ -37,6 +37,8 @@ class Robot {
 }
 
 function parseRobots() {
+	if (!file_exists("tmp/robots.txt")) return [];
+
 	$robotsData = file_get_contents("tmp/robots.txt");
 	$robots = [];
 	$rows = explode("\n", $robotsData); // all robots lines
