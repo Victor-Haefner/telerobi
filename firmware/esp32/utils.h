@@ -13,6 +13,7 @@ struct SplitString {
 };
 
 SplitString strSplit(String str, char delim);
+SplitString strSplit(String str, char delim, char delim2);
 
 struct Pair {
   String key;

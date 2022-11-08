@@ -146,17 +146,20 @@ String RobotServer::get(String para) {
 static bool asyncBusy = false;
 
 void RobotServer::handleCommands(String commands, void(*onCommand)(String&)) {
-  SplitString splitString = strSplit(commands, '\n');
+  SplitString splitString = strSplit(commands, '\t', '\n');
   if (splitString.N == 0) return;
         
   for (int i=0; i<splitString.N; i++) {
     String cmd = splitString.strings[i];
-    Serial.println(" got command: " + cmd);
+    //Serial.println(" got command: " + cmd);
     //if (cmd != "") (*onCommand)(cmd); // TODO: crash!
 
     if (cmd == "StartStream") { state->doStream = true; return; }
     if (cmd == "StopStream") { state->doStream = false; return; }
-    if (cmd.substring(0,4) == "Cmd:") Serial2.println(cmd); // send to arduino
+    if (cmd.substring(0,4) == "Cmd:") {
+      //for (int j = 0; j<cmd.length(); j++) Serial.print(" "+String(int(cmd[j])));   
+      Serial2.println(cmd); // send to arduino
+    }
   }
 }
 
@@ -164,7 +167,7 @@ void RobotServer::getCommands(void(*onCommand)(String&)) {
   if (!asyncBusy) {
     aclient->onConnect([&](void* arg, AsyncClient* aclient) {
       aclient->onData([&](void* arg, AsyncClient* aclient, void* data, size_t len) {
-        String commands((const char*)data, len); 
+        String commands((const char*)data, len);
         handleCommands(commands, onCommand);
         aclient->close();
       }, NULL);

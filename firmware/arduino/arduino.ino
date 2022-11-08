@@ -15,6 +15,8 @@ Robot* robot = 0;
 Scheduler* scheduler = 0;
 
 void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);
+
   // TODO: config! ..or maybe identify the board??
   String bot = "Elegoo";
   //String bot = "Telerobi";
@@ -23,13 +25,17 @@ void setup() {
     Serial.begin(115200);
     espInput.begin(9600); 
   }
+
+  if (bot == "Elegoo") {
+    Serial.begin(9600);
+  }
   
   config = getConfig(bot);
   robot = new Robot(config);
   robot->setup(config->N_actuators);
   scheduler = new Scheduler(robot, config);
 
-  Serial.println("Uno started");
+  //Serial.println("Uno started");
   //delay(2000);
 
   /*string cmd = scheduler->genActorCommand(1, 180, 10, 0); // set Actor i, Speed s, Duration d, Offset o
@@ -49,6 +55,15 @@ void setup() {
   scheduler->processSerialInput('\n');*/
 }
 
+void blink(int d, int n) {
+  for (int i=0; i<n; i++) {
+    digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
+    delay(d);                       // wait for a second
+    digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
+    delay(d);                       // wait for a second
+  }
+}
+
 void loop() {
   scheduler->update();
 
@@ -63,7 +78,9 @@ void loop() {
     while (Serial.available() > 0) {
       char c = Serial.read();      // read a byte
       scheduler->processSerialInput(c);
+      //blink(10, 2);
+      //string cmd = scheduler->genActorCommand(1, 180, 10, 0); // set Actor i, Speed s, Duration d, Offset o
+      //scheduler->processCommand(cmd);
     }
   }
-
 }
