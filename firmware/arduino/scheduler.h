@@ -2,27 +2,10 @@
 #define SCHEDULER_H
 
 #include <Arduino.h>
+#include "string.h"
 
 class Robot;
 class Configuration;
-
-class string {
-  public:
-    int length = 0;
-    byte* data = 0;
-
-    string(const char* d, int N = -1); 
-    string(const string& other);
-    ~string(); 
-
-    //string& operator=(string&& other) noexcept;
-    void copy(const string& other);
-    string& operator=(const string& other);
-    byte operator [](int i) const;
-    byte & operator [](int i);
-
-    void print();
-};
 
 class Command {
   public:
