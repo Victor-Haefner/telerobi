@@ -71,10 +71,13 @@ def listenTCP():
 					#print 'got data:', data
 					if data.startswith('getCommands'):
 						#print 'got getCommands!'
-						with open('tmp/cmds-'+botID+'.txt', 'r') as file:
-							data = file.read()
-							#print 'send', data
-							connection.sendall(data)
+						data = ""
+						cmdsPath = 'tmp/cmds-'+botID+'.txt'
+						if os.path.isfile(cmdsPath):
+							with open(cmdsPath, 'r') as file:
+								data = file.read()
+						#print 'send', data
+						connection.sendall(data)
 						open('tmp/cmds-'+botID+'.txt', 'w').close()
 					if data.startswith('getStatus'):
 						connection.sendall('udp:'+udpState);
