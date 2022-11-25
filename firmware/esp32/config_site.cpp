@@ -106,6 +106,8 @@ void RobotConfigurator::handleClientData(String data, WiFiClient& client) {
   SplitString splitString = strSplit(data, ' ');
   if (splitString.N <= 1) { closeConnection(client); return; }
   String uri = splitString.strings[1];
+
+  delay(1000);
   
   Map params = parseUri(uri);
   String path = params.get("path");
