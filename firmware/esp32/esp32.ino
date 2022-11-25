@@ -16,8 +16,7 @@ void testSSID() {
   delay(3000);
  
   WiFi.mode(WIFI_AP_STA);
-  //WiFi.begin("poli", "ilovepoli");
-  WiFi.begin("VicFair", "020388()");
+  WiFi.begin("MySSID", "12345678");
   Serial.print("Connecting");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
