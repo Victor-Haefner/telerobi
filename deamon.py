@@ -1,4 +1,4 @@
-import socket, struct, shutil, threading, sys, os, datetime
+import socket, struct, shutil, threading, sys, os, datetime, time
 
 botID = sys.argv[1]
 udpPort = sys.argv[2]
@@ -58,6 +58,8 @@ def listenUDP():
                 	else: f.close()
 
 def listenTCP():
+	lastPoll = 0
+
 	#print 'start listening TCP'
 	sockTCP.listen(1)
 	while True:
@@ -78,9 +80,12 @@ def listenTCP():
 								data = file.read()
 						#print 'send', data
 						connection.sendall(data)
+						lastPoll = time.time()
 						open('tmp/cmds-'+botID+'.txt', 'w').close()
 					if data.startswith('getStatus'):
-						connection.sendall('udp:'+udpState);
+						status = 'udp:'+udpState
+						status += ';lastPoll:'+str(lastPoll)
+						connection.sendall(status);
 				break
 		finally:
 			#print 'close connection'
