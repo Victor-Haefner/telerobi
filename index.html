@@ -150,19 +150,23 @@
 			if (selected == undefined) return;
 		
 			var date = new Date(selected.lastRegistred*1000);			
-			var infoW = document.getElementById('botInfo');
-			infoW.innerHTML = "<b>Name:</b> " + selected.innerHTML;
-			infoW.innerHTML += "<br><b>Registred the:</b> " + date.toString();
-			infoW.innerHTML += "<br><b>Ports:</b> " + selected.ports;
+			var udpInfo = document.getElementById('udpInfo');
+			var pollInfo = document.getElementById('pollInfo');
+			
+			udpInfo.innerHTML = "<b>Name:</b> " + selected.innerHTML;
+			udpInfo.innerHTML += "<br><b>Registred the:</b> " + date.toString();
+			udpInfo.innerHTML += "<br><b>Ports:</b> " + selected.ports;
 
 			var req = new XMLHttpRequest();
 			req.open( "GET", "getDeamonStatus.php?botID="+selected.botID, false );
 			req.send( null );
 			var status = req.responseText;
 
-			infoW.innerHTML += "<br><b>Deamon:</b> " + status;
-			
-			setTimeout(updateBotInfo, 200);
+			var data = status.split(";");
+			udpInfo.innerHTML += "<br><b>Deamon:</b> " + data[0];
+			pollInfo.innerHTML = "last polled: " + Date(data[1].split(":")[1]);
+
+			setTimeout(updateBotInfo, 500);
 		}
 	
 		function commandRobot(cmd) {
@@ -363,7 +367,10 @@
 <body>
 	<div id='botPannel'>
 		<div id='robots'></div>
-		<div id='botInfo'></div>
+		<div id='botInfo'>
+			<div id='udpInfo'></div>
+			<div id='pollInfo'></div>
+		</div>
 		<div id='botDebug'>
 			<button onclick='sendTestImage()'>Test Image</button>
 		</div>
