@@ -163,9 +163,11 @@
 			var status = req.responseText;
 
 			var data = status.split(";");
-			udpInfo.innerHTML += "<br><b>Deamon:</b> " + data[0];
-			pollInfo.innerHTML = "last polled: " + Date(data[1].split(":")[1]);
-
+			if (data.length >= 2) {
+				udpInfo.innerHTML += "<br><b>Deamon:</b> " + data[0];
+				lP = new Date(data[1].split(":")[1] * 1000);
+				pollInfo.innerHTML = "last polled: " + lP.toString();
+			}
 			setTimeout(updateBotInfo, 500);
 		}
 	
