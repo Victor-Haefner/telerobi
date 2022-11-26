@@ -275,6 +275,7 @@
 			console.log(theArrow);
 		}
 
+		var navigationMode = 'delayed';
 		var currentCmd = '';
 		var time0 = 0;
 		function startCmd(cmd) {
@@ -356,12 +357,18 @@
 			setTimeout(updateArrow, 50);
 		}
 
-		function sendTestImage() {
-			
+		function sendTestImage() {	
 			var req = new XMLHttpRequest();
                         //req.addEventListener("load", onGetRobotList);
                         req.open( "GET", "sendTestImage.php?botID="+selected.botID, true );
                         req.send( null );
+		}
+
+		function onNavChange(cbox) {
+			navigationMode = cbox.value;
+			var checkboxes = document.getElementsByName('navigation');
+    			checkboxes.forEach( (item) => { item.checked = false } );
+			cbox.checked = true;
 		}
 	</script>
 </head>
@@ -376,6 +383,10 @@
 		<div id='botDebug'>
 			<button onclick='sendTestImage()'>Test Image</button>
 		</div>
+
+		<label>Navigation:</label>
+		<label><input type="checkbox" name="navigation" onclick="onNavChange(this)" value="delayed" checked/>delayed</label>      
+		<label><input type="checkbox" name="navigation" onclick="onNavChange(this)" value="direct"/>direct</label>
 	</div>
 	<div id='interface'>
 		<img id='video'></img>
