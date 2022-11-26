@@ -132,17 +132,23 @@
 				selected.className = '';
 				commandRobot("StopStream");
 				console.log("stop stream "+selected.innerHTML);
+				if (selected == this) {
+					selected = undefined;
+					return;
+				}
 			}
 			
 			selected = this;
 			selected.className = 'selected';
 			commandRobot("StartStream");
 			console.log("start stream "+selected.innerHTML);
-
-			updateRobots();
+			
+			updateBotInfo();
 		}
 
 		function updateBotInfo() {
+			if (selected == undefined) return;
+		
 			var date = new Date(selected.lastRegistred*1000);			
 			var infoW = document.getElementById('botInfo');
 			infoW.innerHTML = "<b>Name:</b> " + selected.innerHTML;
@@ -150,11 +156,13 @@
 			infoW.innerHTML += "<br><b>Ports:</b> " + selected.ports;
 
 			var req = new XMLHttpRequest();
-                        req.open( "GET", "getDeamonStatus.php?botID="+selected.botID, false );
-                        req.send( null );
+			req.open( "GET", "getDeamonStatus.php?botID="+selected.botID, false );
+			req.send( null );
 			var status = req.responseText;
 
 			infoW.innerHTML += "<br><b>Deamon:</b> " + status;
+			
+			setTimeout(updateBotInfo, 200);
 		}
 	
 		function commandRobot(cmd) {
@@ -182,8 +190,6 @@
 				bot.onclick = onRobotSelect;
 				list.appendChild(bot);
 			}
-
-			updateBotInfo();
 		}
 	
 		function updateRobots() {
