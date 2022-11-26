@@ -11,7 +11,25 @@ State state;
 RobotServer botServer;
 RobotConfigurator configurator;
 
+void testSSID() {
+  Serial.begin(9600);
+  delay(3000);
+ 
+  WiFi.mode(WIFI_AP_STA);
+  WiFi.begin("MySSID", "12345678");
+  Serial.print("Connecting");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.println(WiFi.status());
+  }
+  Serial.println(" connected");
+}
+
+bool setupDone = false;
+
 void setup() {
+  //testSSID();
+
   configurator.readPreferences(&settings);
 
   state.needsSSIDConnect = true;
@@ -37,7 +55,7 @@ void setup() {
 
   Serial.println("ESP32 set up for model "+settings.botModel);
 
-  //delay(3000);
+  delay(3000);
 
   // open access point for local config
   WiFi.setTxPower(WIFI_POWER_19_5dBm);
@@ -47,15 +65,19 @@ void setup() {
   Serial.println(IP);
   Serial.println(WiFi.macAddress());
 
+  delay(3000);
   // load ssid, password, server IP address and robot name from preferences
   botServer.start(&settings, &state);
   configurator.start(&settings, &state);
   
+  delay(3000);
   Serial.println(" init camera");
   if (settings.botModel == "Elegoo") init_camera_elegoo();
   //if (settings.botModel == "Elegoo") init_camera("M5STACK_WIDE");
   if (settings.botModel == "Telerobi") init_camera("AI_THINKER");
   Serial.println("Finished setup");
+
+  setupDone = true;
 }
 
 void on_stream_capture(Image img) {
@@ -87,6 +109,7 @@ void testCmd() {
 }
 
 void loop() {
+  if (!setupDone) { delay(1000); return; }
   //testCmd();
   if (state.state == "unregistred") botServer.registerAtServer();
   

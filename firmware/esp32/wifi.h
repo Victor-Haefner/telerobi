@@ -14,7 +14,7 @@ class RobotServer {
   private:
     HTTPClient* client = 0;
     AsyncClient* aclient = 0;
-    Settings* settings = 0; 
+    Settings* settings = 0;
     State* state = 0;
     int udpPort = 4500;
     int tcpPort = 4600;
