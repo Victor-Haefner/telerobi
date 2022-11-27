@@ -146,6 +146,23 @@
 			updateBotInfo();
 		}
 
+		function onBotInfo() {
+                        var udpInfo = document.getElementById('udpInfo');
+                        var pollInfo = document.getElementById('pollInfo');
+
+                        var status = this.responseText;
+
+                        var data = status.split(";");
+                        if (data.length >= 2) {
+                                //udpInfo.innerHTML += "<br><b>Deamon:</b> " + data[0];
+                                lP = new Date(data[1].split(":")[1] * 1000);
+                                pollInfo.innerHTML = "last polled: " + lP.toString();
+                        }
+			
+			//console.log("onBotInfo");
+			setTimeout(updateBotInfo, 500);
+		}
+
 		function updateBotInfo() {
 			if (selected == undefined) return;
 		
@@ -158,17 +175,10 @@
 			udpInfo.innerHTML += "<br><b>Ports:</b> " + selected.ports;
 
 			var req = new XMLHttpRequest();
-			req.open( "GET", "getDeamonStatus.php?botID="+selected.botID, false );
+			req.addEventListener("load", onBotInfo);
+			req.open( "GET", "getDeamonStatus.php?botID="+selected.botID, true );
 			req.send( null );
-			var status = req.responseText;
-
-			var data = status.split(";");
-			if (data.length >= 2) {
-				udpInfo.innerHTML += "<br><b>Deamon:</b> " + data[0];
-				lP = new Date(data[1].split(":")[1] * 1000);
-				pollInfo.innerHTML = "last polled: " + lP.toString();
-			}
-			setTimeout(updateBotInfo, 500);
+			//setTimeout(updateBotInfo, 500);
 		}
 	
 		function commandRobot(cmd) {
