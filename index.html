@@ -173,7 +173,7 @@
 		function onBotInfo() {
                         var udpInfo = document.getElementById('udpInfo');
                         var pollInfo = document.getElementById('pollInfo');
-
+			pollInfo.innerHTML = "";
                         var status = this.responseText;
 
                         var data = status.split(";");
