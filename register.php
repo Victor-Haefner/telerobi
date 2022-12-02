@@ -61,7 +61,7 @@ if ($bot->tcpPort == 0) {
 
 function startDeamon($bot) {
 	//echo "start deamon for $bot->uID!\n";
-	$cmd = "python deamon.py $bot->uID $bot->udpPort $bot->tcpPort > /dev/null &";
+	$cmd = "python telerobiDeamon.py $bot->uID $bot->udpPort $bot->tcpPort > /dev/null &";
 	exec($cmd);
 	usleep(1000000); // wait for python to write its pID
 	$pIDfile = "tmp/$bot->uID.txt";
