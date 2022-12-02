@@ -125,6 +125,27 @@
 	</style>
 
 	<script>
+		function howLongAgo(t) {
+			var n = new Date();
+			var d = n.getTime() - t.getTime();
+			var days = Math.floor(d / (1000 * 60 * 60 * 24));
+			d -=  days * (1000 * 60 * 60 * 24);
+
+			var hours = Math.floor(d / (1000 * 60 * 60));
+			d -= hours * (1000 * 60 * 60);
+
+			var mins = Math.floor(d / (1000 * 60));
+			d -= mins * (1000 * 60);
+
+			var seconds = Math.floor(d / (1000));
+			d -= seconds * (1000);
+
+			if (days > 0) return days+' days ago';
+			if (hours > 0) return hours+' hours ago';
+			if (mins > 0) return mins+' minutes ago';
+			return seconds+' seconds ago';
+		}
+
 		var selected = undefined;
 		function onRobotSelect() {		
 			//if (this.status != 'connected') return;
@@ -156,7 +177,7 @@
                         if (data.length >= 2) {
                                 //udpInfo.innerHTML += "<br><b>Deamon:</b> " + data[0];
                                 lP = new Date(data[1].split(":")[1] * 1000);
-                                pollInfo.innerHTML = "last polled: " + lP.toString();
+                                pollInfo.innerHTML = "last polled: " + howLongAgo(lP);
                         }
 			
 			//console.log("onBotInfo");
@@ -171,7 +192,7 @@
 			var pollInfo = document.getElementById('pollInfo');
 			
 			udpInfo.innerHTML = "<b>Name:</b> " + selected.innerHTML;
-			udpInfo.innerHTML += "<br><b>Registred the:</b> " + date.toString();
+			udpInfo.innerHTML += "<br><b>Registred</b> " + howLongAgo(date);
 			udpInfo.innerHTML += "<br><b>Ports:</b> " + selected.ports;
 
 			var req = new XMLHttpRequest();
