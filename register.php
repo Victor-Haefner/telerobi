@@ -75,6 +75,12 @@ function startDeamon($bot) {
 	}
 }
 
+function stopDeamon($bot) {
+	$out = [];
+	$cmd = "kill $bot->pID";
+	exec($cmd, $out);
+}
+
 function deamonRunning($bot) {
 	$out = [];
 	exec("ps -p $bot->pID", $out);
@@ -89,9 +95,12 @@ function deamonRunning($bot) {
 if ($bot->pID == 0) {
 	startDeamon($bot);
 } else {
-	if (deamonRunning($bot) === false) {
+	stopDeamon($bot);
+	usleep(1000000); // wait for deamon to be killed!
+	startDeamon($bot);
+	/*if (deamonRunning($bot) === false) {
 		startDeamon($bot);
-	}
+	}*/
 }
 
 
