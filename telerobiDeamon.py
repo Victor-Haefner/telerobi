@@ -17,6 +17,8 @@ server_address = '0.0.0.0'
 server_port_UDP = int(udpPort)
 server_port_TCP = int(tcpPort)
 
+sockUDP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+sockTCP.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 sockUDP.bind((server_address, server_port_UDP))
 sockTCP.bind((server_address, server_port_TCP))
 print "Listening on " + server_address + ":" + str(server_port_UDP) + " and :"+str(server_port_TCP)

@@ -142,6 +142,7 @@
 			var seconds = Math.floor(d / (1000));
 			d -= seconds * (1000);
 
+			if (days > 1000) return 'never';
 			if (days > 0) return days+' days ago';
 			if (hours > 0) return hours+' hours ago';
 			if (mins > 0) return mins+' minutes ago';
