@@ -193,20 +193,20 @@ void RobotServer::getCommands(void(*onCommand)(String&)) {
 
 void RobotServer::registerAtServer() {
   Serial.println("register at server");
-  String botID = getBoardID();
+  state->botID = getBoardID();
 
   Serial.println("Connected to server, register robot!");
-  String commands = get("pollCommands.php?botID="+botID);
-  String ports = get("register.php?uid="+botID+"&name="+settings->botName); // php: 'echo "ports: $bot->udpPort $bot->tcpPort";'
+  String commands = get("pollCommands.php?botID="+state->botID);
+  state->ports = get("register.php?uid="+state->botID+"&name="+settings->botName); // php: 'echo "ports: $bot->udpPort $bot->tcpPort";'
   Serial.println(commands);
   
-  SplitString splitString = strSplit(ports, ' ');
+  SplitString splitString = strSplit(state->ports, ' ');
   if (splitString.N > 2) {
     udpPort = splitString.strings[1].toInt();
     tcpPort = splitString.strings[2].toInt();
   }
   Serial.print("Got ports, ");
-  Serial.println(ports);
+  Serial.println(state->ports);
   Serial.print(" ..using ports: ");
   Serial.print(udpPort);
   Serial.print(" and ");

@@ -209,7 +209,8 @@ void RobotConfigurator::servePageSettings(WiFiClient& client) {
   client.println("<p>Configured to connect to: " + settings->ssid + "</p>");
   client.println("<p>Wifi status: " + wifiStatusStr() + "</p>");
   if (WiFi.status() == WL_CONNECTED) {
-    client.println("<p>Connected to: " + state->connected_ssid + ", "+WiFi.SSID()+"</p>");
+    client.println("<p>Connected to: " + state->connected_ssid + ", "+WiFi.SSID() + "</p>");
+    client.println("<p>UDP ports: " + state->ports + "</p>");
   } else {
     client.println("<p>Not Connected</p>");
   }
@@ -248,10 +249,6 @@ void RobotConfigurator::servePageSettings(WiFiClient& client) {
    // The HTTP response ends with another blank line
   client.println();
   // Break out of the while loop
-
-  // TODO: print 'connected to ' + ssid
-  //       or    'not connected'
-  //       depending on   if (WiFi.status() != WL_CONNECTED)
 }
 
 void RobotConfigurator::processHTTPinput() {

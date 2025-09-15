@@ -1,3 +1,3 @@
 <?php
-echo file_get_contents("tmp/robots.txt");
+echo file_get_contents("botData/robots.txt");
 ?>

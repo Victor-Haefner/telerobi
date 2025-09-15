@@ -49,6 +49,9 @@ struct State {
   String state;
   bool doStream;
   String connected_ssid;
+
+  String botID = "undefined";
+  String ports = "undefined";
 };
 
 #endif // UTILS_H

@@ -64,7 +64,7 @@ function startDeamon($bot) {
 	$cmd = "python telerobiDeamon.py $bot->uID $bot->udpPort $bot->tcpPort > /dev/null &";
 	exec($cmd);
 	usleep(1000000); // wait for python to write its pID
-	$pIDfile = "tmp/$bot->uID.txt";
+	$pIDfile = "botData/$bot->uID.txt";
 	if (file_exists($pIDfile)) {
 		$bot->pID = file_get_contents($pIDfile);
 		unlink($pIDfile);
@@ -110,7 +110,7 @@ foreach($robots as $uid => $b) {
 	$rows[] = $b->asString();
 }
 $robotsData = join("\n", $rows);
-file_put_contents("tmp/robots.txt", $robotsData);
+file_put_contents("botData/robots.txt", $robotsData);
 
 echo "ports: $bot->udpPort $bot->tcpPort";
 ?>
