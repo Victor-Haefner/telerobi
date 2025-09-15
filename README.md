@@ -22,3 +22,9 @@ created during the Erasmus+ project named
       * a robot name
       * the local SSID and password the robot should connect to
       * the server IP address
+      
+## Trouble shooting
+* if the esp board does not appear in the Arcuino IDE:
+  * check if /dev/ttyUSB0 is there
+    * if not check USB messages with 'sudo dmesg -w'
+

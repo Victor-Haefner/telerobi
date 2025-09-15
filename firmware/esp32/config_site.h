@@ -1,10 +1,10 @@
 #ifndef CONFIG_SITE_H
 #define CONFIG_SITE_H
 
+#include <WiFi.h>
 #include <Arduino.h>
 #include <WebServer.h>
 
-class WiFiClient;
 struct Settings;
 struct State;
 

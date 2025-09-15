@@ -18,6 +18,8 @@ String wifiStatusStr() {
   if (status == WL_SCAN_COMPLETED) return "scan completed";
   if (status == WL_CONNECTION_LOST) return "connection lost";
   if (status == WL_DISCONNECTED) return "disconnected";
+  if (status == WL_NO_SHIELD) return "no shield";
+  if (status == WL_STOPPED) return "stopped";
   return "unknown status " + String(status);
 }
 
@@ -90,7 +92,7 @@ void RobotServer::disconnectSSID() {
 }
 
 void RobotServer::connectSSID() {
-  if (WiFi.status() != WL_DISCONNECTED && WiFi.status() != 255) {
+  if (WiFi.status() != WL_DISCONNECTED && WiFi.status() != WL_NO_SHIELD && WiFi.status() != WL_STOPPED) {
     disconnectSSID();
     Serial.println("Wait for wifi disconnected!\n");
     return;
@@ -106,7 +108,7 @@ void RobotServer::connectSSID() {
 void RobotServer::checkSSIDConnection() {
   int status = WiFi.status();
   
-  if (status == WL_DISCONNECTED) {
+  if (status == WL_DISCONNECTED || status == WL_STOPPED) {
     state->connected_ssid = "none";
     Serial.print(".");
     Serial.flush();

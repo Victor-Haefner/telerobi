@@ -48,18 +48,24 @@ void setup() {
 
   if (settings.botModel == "Telerobi") {
     Serial2.begin(9600, SERIAL_8N1, 3, 1); //Serial ESP32 Cam
-    ledcAttachPin(4, 0);
-    ledcSetup(0, 4000, 8);
-    ledcWrite(0, 15); //255
+    ledcAttach(4, 4000, 8);
+    ledcWrite(4, 1); //255
   }
 
   Serial.println("ESP32 set up for model "+settings.botModel);
 
   delay(3000);
 
+  IPAddress local_IP(192, 168, 4, 1);
+  IPAddress gateway(192, 168, 4, 1);
+  IPAddress subnet(255, 255, 255, 0);
+
   // open access point for local config
   WiFi.setTxPower(WIFI_POWER_19_5dBm);
-  WiFi.softAP("trineBot", "bot12345"); // Password with at least 8 characters, if less, the AP will be named ELEGOO-something and be open access
+  WiFi.softAPConfig(local_IP, gateway, subnet);
+  //WiFi.softAP("trineBot", "bot12345", 1); // Password with at least 8 characters, if less, the AP will be named ELEGOO-something and be open access
+  WiFi.softAP("trineBot"); // without Password, for debugging
+  delay(500);
   IPAddress IP = WiFi.softAPIP();
   Serial.println("AP IP and mac address: ");
   Serial.println(IP);
