@@ -133,7 +133,7 @@ void RobotServer::checkSSIDConnection() {
 }
 
 String RobotServer::get(String para) {
-  String host = settings->serverIPasString+":80";
+  String host = settings->serverIPasString;
   String uri = "https://"+host+settings->serverPath+"/"+para;
   //Serial.println(uri);
 

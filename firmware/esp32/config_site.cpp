@@ -135,6 +135,7 @@ void RobotConfigurator::handleClientData(String data, WiFiClient& client) {
     settings->ssid = params.get("ssid");
     settings->password = params.get("password");
     settings->serverIPasString = params.get("serveradd");
+    settings->serverPath = params.get("serverpath");
     settings->botName = params.get("bot");
     settings->botModel = params.get("model");
     if (settings->ssid == "") return;
@@ -142,12 +143,14 @@ void RobotConfigurator::handleClientData(String data, WiFiClient& client) {
     Serial.println("    got ssid: " + settings->ssid);
     Serial.println("    got pass: " + settings->password);
     Serial.println("    got server address: " + settings->serverIPasString);
+    Serial.println("    got server path: " + settings->serverPath);
     Serial.println("    got robot name: " + settings->botName);
     Serial.println("    got robot model: " + settings->botModel);
     preferences.begin("credentials", false);
     preferences.putString("ssid", settings->ssid);
     preferences.putString("password", settings->password);
     preferences.putString("serverIP", settings->serverIPasString);
+    preferences.putString("serverPath", settings->serverPath);
     preferences.putString("botName", settings->botName);
     preferences.putString("botModel", settings->botModel);
     preferences.end();
@@ -188,6 +191,7 @@ void RobotConfigurator::servePageSettings(WiFiClient& client) {
   // Robot Server
   client.println("<h2>Server</h2>");
   client.println("<div>Server Address:<input type='text' name='Server Address' id = 'input_serveraddress' value='" + settings->serverIPasString + "'></div>");
+  client.println("<div>Server Path:<input type='text' name='Server Path' id = 'input_serverpath' value='" + settings->serverPath + "'></div>");
   client.println("<div>Robot Name:<input type='text' name='Robot Name' id = 'input_robotname' value='" + settings->botName + "'></div>");
 
   String model = settings->botModel;
@@ -232,9 +236,10 @@ void RobotConfigurator::servePageSettings(WiFiClient& client) {
   client.println("  var pass = document.getElementById('input_password').value;");
   client.println("  var bot = document.getElementById('input_robotname').value;");
   client.println("  var serveradd = document.getElementById('input_serveraddress').value;");
+  client.println("  var serverpath = document.getElementById('input_serverpath').value;");
   client.println("  var cbox = document.getElementById('RobotModel');");
   client.println("  var model = cbox.options[cbox.selectedIndex].value;");
-  client.println("  send('handleSettings?ssid='+ssid+'&password='+pass+'&serveradd='+serveradd+'&bot='+bot+'&model='+model);");
+  client.println("  send('handleSettings?ssid='+ssid+'&password='+pass+'&serveradd='+serveradd+'&serverpath='+serverpath+'&bot='+bot+'&model='+model);");
   client.println("}");
 
   client.println("function getImage() {");
