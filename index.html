@@ -7,6 +7,14 @@
 			flex-direction: row;
 			margin: 0;
 		}
+		
+		#phpStatus {
+			position: fixed;
+			bottom: 0;
+			right: 0;
+			font-size: 1.5vh;
+			padding: 1vh;
+		}
 
 		#botPannel {
 			display: flex;
@@ -238,6 +246,18 @@
 			req.open( "GET", "getRobots.php", true );
 			req.send( null );
 		}
+	
+		function onCheckPHP () {
+			var list = document.getElementById('phpStatus');
+			list.innerHTML = this.responseText;
+		}
+	
+		function checkPHP() {
+			var req = new XMLHttpRequest();
+			req.addEventListener("load", onCheckPHP);
+			req.open( "GET", "checkPHP.php", true );
+			req.send( null );
+		}
 		
 		var doStream = false;
 		
@@ -435,8 +455,10 @@
 			<button onpointerdown='startCmd("Right")'   >Right</button>
 		</div>
 	</div>
+	<div id='phpStatus'></div>
 	
 	<script>
+		checkPHP();
 		updateRobots();
 		addArrows();
 		updateArrow();
